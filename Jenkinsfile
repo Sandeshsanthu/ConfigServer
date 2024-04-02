@@ -27,6 +27,5 @@ node {
          credentialsId: env.PROJECT_ID,
          verifyDeployments: true 
         ])
-
     }
 }
