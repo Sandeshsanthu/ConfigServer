@@ -2,26 +2,21 @@ node {
     def repourl = "${REGISTRY_URL}/${PROJECT_ID}/${ARTIFACT_REGISTRY}"
     def mvnHome = tool name: 'maven', type: 'maven'
     def mvnCMD = "${mvnHome}/bin/mvn"
-    stage('Checkout'){
-            Checkout([$class: 'GitSCM',
-             branches: [[name: '*/main']],
-              extensions: [],
-              url: 'https://github.com/Sandeshsanthu/ConfigServer.git'
-            ])
-
+    stage('Checkout') {
+        checkout([$class: 'GitSCM',
+         branches: [[name: '*/main']],
+          extensions: [],
+          userRemoteConfigs: [[url: 'https://github.com/Sandeshsanthu/ConfigServer.git']]
+        ])
     }
-    stage('Build and Push')
-        
-    {
-        withCredentials([file(credentialsID: 'gcp', variable: 'GC_KEY')]){
+    stage('Build and Push') {
+        withCredentials([file(credentialsID: 'gcp', variable: 'GC_KEY')]) {
             sh("gcloud auth activate-service-account  --key-file=${GC_KEY}")
             sh 'gcloud auth configure-docker us-central1-docker.pkg.dev'
             sh "${mvnCMD} clean install jib:build -DREPO_URL=${REGISTRY_URL}/${PROJECT_ID}/${ARTIFACT_REGISTRY}"
-            
         }
     }
-    stage('Deploy')
-    {
+    stage('Deploy') {
         sh "sed -i 's|IMAGE_URL|${repourl}g' k8s/deployment.yaml"
         step([$class: 'KubernetesEngineBuilder',
              projectId: env.PROJECT_ID,
