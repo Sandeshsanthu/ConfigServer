@@ -17,15 +17,16 @@ node {
         }
     }
     stage('Deploy') {
-        sh "sed -i 's|IMAGE_URL|'"${repourl}"'g' k8s/deployment.yaml"
+    sh "sed -i 's|IMAGE_URL|${repourl}|g' k8s/deployment.yaml"
 
-        step([$class: 'KubernetesEngineBuilder',
-             projectId: env.PROJECT_ID,
-             clusterName: env.CLUSTER,
-             location:    env.ZONE,
-             mainfestPattern: 'k8s/deployment.yaml',
-             credentialsId: env.PROJECT_ID,
-             verifyDeployments: true 
-            ])
+    step([$class: 'KubernetesEngineBuilder',
+         projectId: env.PROJECT_ID,
+         clusterName: env.CLUSTER,
+         location: env.ZONE,
+         manifestPattern: 'k8s/deployment.yaml',
+         credentialsId: env.PROJECT_ID,
+         verifyDeployments: true 
+        ])
+
     }
 }
