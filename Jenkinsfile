@@ -24,7 +24,7 @@ node {
          clusterName: env.CLUSTER,
          location: env.ZONE,
          manifestPattern: 'k8s/deployment.yaml',
-         credentialsId: env.PROJECT_ID,
+         credentialsId: env.gcp,
          verifyDeployments: true 
         ])
     }
